@@ -22,6 +22,12 @@ class AnalyzeReviewsTests(unittest.TestCase):
         self.assertAlmostEqual(
             excellent.posterior_positive_given_keyword, 2 / 3
         )
+        self.assertAlmostEqual(
+            excellent.posterior_positive_given_keyword,
+            excellent.likelihood_keyword_given_positive
+            * excellent.prior_positive
+            / excellent.marginal_keyword,
+        )
         self.assertAlmostEqual(awful.prior_positive, 0.5)
         self.assertAlmostEqual(awful.likelihood_keyword_given_positive, 0.0)
         self.assertAlmostEqual(awful.marginal_keyword, 0.5)
@@ -48,6 +54,16 @@ class AnalyzeReviewsTests(unittest.TestCase):
                     {"review": "A bad film", "sentiment": "negative"},
                 ],
                 ("unseen",),
+            )
+
+    def test_no_positive_reviews_are_rejected(self):
+        with self.assertRaisesRegex(ValueError, "no positive reviews"):
+            analyze_reviews(
+                [
+                    {"review": "Terrible movie", "sentiment": "negative"},
+                    {"review": "Awful movie", "sentiment": "negative"},
+                ],
+                ("terrible",),
             )
 
 
