@@ -64,6 +64,21 @@ CSV rather than loading all review text into memory. A keyword that never
 appears causes an explicit error because its posterior is not estimable from
 the data.
 
+## Modular structure
+
+The implementation separates each responsibility into one reusable function:
+
+- `read_reviews` validates the CSV headers and yields normalized review records.
+- `analyze_reviews` counts reviews and calculates all four probabilities for
+  any supplied keyword sequence; it does not read files or print results.
+- `format_results` formats the calculated values for display.
+- `main` connects file input, analysis, error reporting, and console output.
+
+The keyword lists are defined once and combined into `KEYWORDS`, while a
+single analysis loop handles every keyword. This keeps the probability logic
+from being duplicated for positive and negative words and makes the core
+calculation independently testable.
+
 **Worked example (`excellent`):** 25,000 of 50,000 reviews are positive, so
 `P(Positive) = 25,000 / 50,000 = 0.5`. The word appears in 2,868 positive
 reviews, so `P(excellent | Positive) = 2,868 / 25,000 = 0.11472`. It appears
