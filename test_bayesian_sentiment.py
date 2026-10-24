@@ -1,9 +1,39 @@
+import csv
+import tempfile
 import unittest
+from pathlib import Path
 
-from bayesian_sentiment import analyze_reviews, format_results
+from bayesian_sentiment import analyze_reviews, format_results, read_reviews
 
 
 class AnalyzeReviewsTests(unittest.TestCase):
+    def test_csv_reader_normalizes_column_names(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            csv_path = Path(temporary_directory) / "reviews.csv"
+            with csv_path.open("w", encoding="utf-8", newline="") as csv_file:
+                writer = csv.DictWriter(
+                    csv_file, fieldnames=(" Review ", "SENTIMENT")
+                )
+                writer.writeheader()
+                writer.writerow(
+                    {" Review ": "A great film", "SENTIMENT": "positive"}
+                )
+
+            reviews = list(read_reviews(csv_path))
+
+        self.assertEqual(
+            reviews,
+            [{"review": "A great film", "sentiment": "positive"}],
+        )
+
+    def test_csv_reader_reports_missing_required_columns(self):
+        with tempfile.TemporaryDirectory() as temporary_directory:
+            csv_path = Path(temporary_directory) / "reviews.csv"
+            csv_path.write_text("review\nA great film\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "sentiment"):
+                list(read_reviews(csv_path))
+
     def test_bayes_probabilities_use_review_level_keyword_presence(self):
         reviews = [
             {"review": "Excellent, excellent movie", "sentiment": "positive"},
