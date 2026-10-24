@@ -5,7 +5,7 @@ import csv
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Mapping, Sequence
+from typing import Iterable, Iterator, Mapping, Sequence
 
 
 POSITIVE_KEYWORDS = ("excellent", "amazing", "wonderful")
@@ -81,16 +81,16 @@ def analyze_reviews(
             )
 
         keyword_positive_count = positive_keyword_counts[keyword]
+        likelihood = keyword_positive_count / positive_count
+        marginal = keyword_count / total_count
         results.append(
             KeywordResult(
                 keyword=keyword,
                 prior_positive=prior_positive,
-                likelihood_keyword_given_positive=(
-                    keyword_positive_count / positive_count
-                ),
-                marginal_keyword=keyword_count / total_count,
+                likelihood_keyword_given_positive=likelihood,
+                marginal_keyword=marginal,
                 posterior_positive_given_keyword=(
-                    keyword_positive_count / keyword_count
+                    likelihood * prior_positive / marginal
                 ),
                 positive_review_count=positive_count,
                 keyword_positive_review_count=keyword_positive_count,
@@ -101,7 +101,7 @@ def analyze_reviews(
     return results
 
 
-def read_reviews(csv_path: Path) -> list[dict[str, str]]:
+def read_reviews(csv_path: Path) -> Iterator[dict[str, str]]:
     """Read the standard Kaggle IMDb CSV, requiring its review and sentiment columns."""
     with csv_path.open("r", encoding="utf-8-sig", newline="") as csv_file:
         reader = csv.DictReader(csv_file)
@@ -115,13 +115,11 @@ def read_reviews(csv_path: Path) -> list[dict[str, str]]:
                 f"{csv_path} is missing required column(s): "
                 + ", ".join(sorted(missing))
             )
-        return [
-            {
+        for row in reader:
+            yield {
                 "review": row[columns["review"]] or "",
                 "sentiment": row[columns["sentiment"]] or "",
             }
-            for row in reader
-        ]
 
 
 def format_results(results: Sequence[KeywordResult]) -> str:
