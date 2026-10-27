@@ -10,12 +10,13 @@
 | Part 3 — Manual gradient descent | [`formative3 part 3 group7.pdf`](./formative3%20part%203%20group7.pdf) | Handwritten matrix calculations and member-by-member updates |
 | Part 4 — Gradient descent in code | [`Gradient_descent/gradient_descent.ipynb`](./Gradient_descent/gradient_descent.ipynb) | SciPy derivative check, updates, predictions, and plots |
 
-| Combined assignment notebook | [`Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb`](./Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb) | Consolidated notebook for the assignment |
-| Presentation guide | [`README_presentation.md`](./README_presentation.md) | Presentation-focused explanations and results |
-| Assignment task sheet | [`BSE Group Assignments - Task Sheet`](./BSE%20Group%20Assignments%20_%20Task%20Sheet_%5BMathematics_for_Machine_Learning_Formative3_Cohort%201_Team7%5D%20-%201.pdf) | Original requirements and marking context |
-| Galton data | [`data/GaltonFamilies.csv`](./data/GaltonFamilies.csv) | Parent/child height data used in Part 1 |
-| IMDb data | [`IMDB Dataset.csv`](./IMDB%20Dataset.csv) | 50,000 movie reviews used in Part 2 |
-
+| Resource | File / Link | Description |
+|---|---|---|
+| Combined Assignment Notebook | [Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb](./Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb) | Consolidated notebook for the assignment |
+| Presentation Guide | [README_presentation.md](./README_presentation.md) | Presentation-focused explanations and results |
+| Assignment Task Sheet | [BSE Group Assignments - Task Sheet](./BSE%20Group%20Assignments%20_%20Task%20Sheet_%5BMathematics_for_Machine_Learning_Formative3_Cohort%201_Team7%5D%20-%201.pdf) | task sheet |
+| Galton Data | [GaltonFamilies.csv](./data/GaltonFamilies.csv) | Parent/child height data used in Part 1 |
+| IMDb Data | [IMDB Dataset.csv](./IMDB%20Dataset.csv) | 50,000 movie reviews used in Part 2 |
 ## Part 1 — Probability distributions and EM
 
 ### Question
