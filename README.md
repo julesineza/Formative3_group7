@@ -1,139 +1,242 @@
-# Formative3_group7
+# Formative 3 — Probability, Bayes, and Gradient Descent
 
-## Part 1: Probability Distributions — Expectation-Maximization (EM) Algorithm
+This repository contains Group 7's submission for the Mathematics for Machine
+Learning formative assignment. It is organized as a facilitator-friendly
+presentation guide: start with the navigation table, then open the relevant
+notebook, Python implementation, dataset, or supporting document for each
+part.
 
-This part implements the Expectation-Maximization (EM) algorithm from scratch in Python to model a mixture of two Gaussian distributions using mothers' and children's height data from the `GaltonFamilies.csv` dataset.
+## Quick navigation
 
-The implementation combines the heights into an unlabeled dataset and estimates the Gaussian mixture parameters: means (\(\mu\)), variances (\(\sigma^2\)), and mixing coefficients (\(\pi\)).
+| Area | Main resource | What to review |
+| --- | --- | --- |
+| Part 1 — Gaussian mixtures and EM | [`notebooks/Part1.ipynb`](./notebooks/Part1.ipynb) | EM from scratch, convergence, mixture plots, and posterior classification |
+| Part 2 — Bayesian probability | [`bayesian_sentiment.py`](./bayesian_sentiment.py) | Keyword selection, Bayes' theorem, probabilities, and formatted results |
+| Part 2 tests | [`test_bayesian_sentiment.py`](./test_bayesian_sentiment.py) | Standard-library tests for the Bayesian implementation |
+| Part 3 — Manual gradient descent | [`formative3 part 3 group7.pdf`](./formative3%20part%203%20group7.pdf) | Handwritten matrix calculations and member-by-member updates |
+| Part 4 — Gradient descent in code | [`Gradient_descent/gradient_descent.ipynb`](./Gradient_descent/gradient_descent.ipynb) | SciPy derivative check, updates, predictions, and plots |
+| Part 4 guide | [`Gradient_descent/README.md`](./Gradient_descent/README.md) | Equations, recorded results, and instructions for running the notebook |
+| Combined assignment notebook | [`Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb`](./Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb) | Consolidated notebook for the assignment |
+| Presentation guide | [`README_presentation.md`](./README_presentation.md) | Presentation-focused explanations and results |
+| Assignment task sheet | [`BSE Group Assignments - Task Sheet`](./BSE%20Group%20Assignments%20_%20Task%20Sheet_%5BMathematics_for_Machine_Learning_Formative3_Cohort%201_Team7%5D%20-%201.pdf) | Original requirements and marking context |
+| Contribution evidence | [`docs/contributions.pdf`](./docs/contributions.pdf) *(to be added)* | Team contribution record and evidence |
+| Galton data | [`data/GaltonFamilies.csv`](./data/GaltonFamilies.csv) | Parent/child height data used in Part 1 |
+| IMDb data | [`IMDB Dataset.csv`](./IMDB%20Dataset.csv) | 50,000 movie reviews used in Part 2 |
 
-The algorithm alternates between two steps:
-- **Expectation (E-step):** Calculates the posterior probabilities (responsibilities) that each height belongs to each Gaussian component.
-- **Maximization (M-step):** Updates the means, variances, and mixing coefficients using the calculated responsibilities.
+> **Submission status:** The manual-calculation PDF and combined assignment
+> notebook are present in the repository. The contribution PDF is still a
+> placeholder; add it at the displayed path so its link becomes active before
+> submission.
 
-The process continues until the log-likelihood converges. The results include a parameter-tracking table for initialization and the first two iterations, visualizations of the height distribution and fitted Gaussian mixture, and posterior probabilities for a test height.
+## Assignment objectives
 
-The implementation also explains why simply splitting the data at the global mean is not a reliable alternative to EM, since hard assignments can misclassify observations that could plausibly belong to either component.
+The assignment develops practical understanding of:
 
-**Tools and libraries:** Python, NumPy, Pandas, Matplotlib, and Seaborn.
+1. Probability distributions and the difference between hard and probabilistic
+   assignments.
+2. Bayesian probability applied to a real-world text-classification problem.
+3. Manual, matrix-based gradient-descent calculations.
+4. A Python implementation of gradient descent for linear regression using
+   NumPy, SciPy, and Matplotlib.
 
-## Bayesian Sentiment Analysis
+All code should remain modular and follow the DRY principle. During the
+presentation, run the notebooks and Python implementation and explain the
+mathematics rather than showing only final screenshots.
 
-This part of the assignment estimates **only** `P(Positive | keyword)` from the
-Kaggle [IMDb Movie Reviews dataset](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews).
-It uses only Python's standard library—no machine-learning packages.
+## Part 1 — Probability distributions and EM
 
-## Run it
+### Question
 
-Download the Kaggle file named `IMDB Dataset.csv` and place it in the repository
-root, then run:
+The Galton dataset contains heights from two populations. This project models
+**mothers and children** as an unlabelled mixture of two Gaussian
+distributions. The same workflow can be adapted to fathers and children.
 
-```powershell
+Dataset source: [Galton parents-versus-children heights on Kaggle](https://www.kaggle.com/datasets/jacopoferretti/parents-heights-vs-children-heights-galton-data).
+
+### Implementation
+
+Open [`notebooks/Part1.ipynb`](./notebooks/Part1.ipynb). The notebook should
+show:
+
+- data loading and preparation from [`data/GaltonFamilies.csv`](./data/GaltonFamilies.csv);
+- an Expectation-Maximization algorithm implemented from scratch;
+- the E-step responsibilities and M-step parameter updates;
+- estimated means (`μ`), variances (`σ²`), and mixing proportions (`π`);
+- log-likelihood values for initialization and at least the first two
+  iterations;
+- a completed parameter-tracking table;
+- mixture/distribution visualizations; and
+- posterior probabilities for a supplied test height.
+
+### Presentation question: split at the global mean?
+
+Do **not** simply split the observations into two piles at the global mean and
+then calculate the mean of each pile as the primary model. That approach makes
+hard assignments before accounting for uncertainty, can be distorted by
+unequal mixture proportions or overlapping distributions, and does not
+estimate the variances or mixing proportions coherently. EM instead assigns a
+responsibility to each component, updates all parameters together, and
+maximizes the mixture log-likelihood. A global-mean split can be shown as a
+baseline, but its resulting group means must be compared with the EM result.
+
+### Required live demonstration
+
+Run the classifier with a random height provided by the facilitator and print
+the exact posterior probabilities:
+
+- `P(Child | height)`
+- `P(Mother | height)`
+
+Use the population names consistently in the notebook and presentation. Do not
+label the second class “basketball player” unless a separate basketball-player
+dataset and model have actually been added.
+
+## Part 2 — Bayesian probability
+
+The implementation uses the [IMDb 50K movie reviews dataset on Kaggle](https://www.kaggle.com/datasets/lakshmi25npathi/imdb-dataset-of-50k-movie-reviews),
+stored in the repository as [`IMDB Dataset.csv`](./IMDB%20Dataset.csv).
+
+Run [`bayesian_sentiment.py`](./bayesian_sentiment.py) from the repository root:
+
+```bash
 python bayesian_sentiment.py
 ```
 
-To use a different location:
+To use another location for the dataset:
 
-```powershell
-python bayesian_sentiment.py "C:\path\to\IMDB Dataset.csv"
+```bash
+python bayesian_sentiment.py "/path/to/IMDB Dataset.csv"
 ```
 
-The CSV must have `review` and `sentiment` columns, with sentiment values
-`positive` or `negative`. The script prints the prior, likelihood, marginal,
-posterior, and the underlying review counts for each selected keyword. The
-selected positive-sentiment keywords are `excellent`, `amazing`, and
-`wonderful`; the negative-sentiment keywords are `terrible`, `awful`, and
-`worst`. For consistency with the assignment, the conditional being reported
-for every keyword (including the negative-indicating words) is
-`P(Positive | keyword)`, not `P(Negative | keyword)`.
+The CSV must contain `review` and `sentiment` columns, with `positive` or
+`negative` sentiment values. The script reports **only**
+`P(Positive | keyword)`, as required by the assignment.
 
-## Keyword choices and rationale
+### Keywords and calculation
 
-We chose three keywords for each class, within the assignment's 2–4 limit.
-`excellent`, `amazing`, and `wonderful` are strongly favorable evaluative
-adjectives; `terrible`, `awful`, and `worst` are strongly unfavorable
-evaluative words. They are easy to explain, intuitive to a reader, and have
-clear sentiment direction. Their measured posteriors in the table below are a
-sanity check against those expectations, not the definition of their sentiment
-or proof that they work in every context. The final group should confirm that
-these are the keywords it selected.
+The selected keywords are:
 
-## Probability calculation
+- Positive indicators: `excellent`, `amazing`, `wonderful`
+- Negative indicators: `terrible`, `awful`, `worst`
 
-A keyword is present in a review if it occurs at least once as a whole word;
-repeating it in the same review does not increase its count. Let `N` be the
-number of reviews, `N_positive` the number labeled positive, `N_keyword` the
-number containing the keyword, and `N_keyword_positive` the number that both
-contain it and are labeled positive. For each keyword:
+A keyword is counted at most once per review, case-insensitively, using whole
+word matching. For each keyword, the script reports:
 
-- Prior: `P(Positive) = N_positive / N`
-- Likelihood: `P(keyword | Positive) = N_keyword_positive / N_positive`
-- Marginal: `P(keyword) = N_keyword / N`
-- Posterior (Bayes' theorem):
-  `P(Positive | keyword) = P(keyword | Positive) * P(Positive) / P(keyword)`
+- prior: `P(Positive)`;
+- likelihood: `P(keyword | Positive)`;
+- marginal: `P(keyword)`; and
+- posterior: `P(Positive | keyword)`.
 
-The code applies this formula directly using basic Python arithmetic. As a
-cross-check, it is equivalent to the count ratio
-`N_keyword_positive / N_keyword`. A word is counted at most once per review,
-case-insensitively, and whole-word matching avoids counting partial matches
-(for example, `amazing` does not match `amazinger`). The program streams the
-CSV rather than loading all review text into memory. A keyword that never
-appears causes an explicit error because its posterior is not estimable from
-the data.
+With `N` as the total number of reviews, `N_positive` as positive reviews,
+`N_keyword` as reviews containing the keyword, and `N_keyword_positive` as
+positive reviews containing it:
 
-## Modular structure
+```text
+P(Positive) = N_positive / N
+P(keyword | Positive) = N_keyword_positive / N_positive
+P(keyword) = N_keyword / N
+P(Positive | keyword) =
+    P(keyword | Positive) * P(Positive) / P(keyword)
+```
 
-The implementation separates each responsibility into one reusable function:
+The implementation uses only basic Python operations and streams the CSV
+instead of loading all review text into memory. It explicitly reports invalid
+headers, invalid sentiment values, missing files, and keywords that never
+occur.
 
-- `read_reviews` validates the CSV headers and yields normalized review records.
-- `analyze_reviews` counts reviews and calculates all four probabilities for
-  any supplied keyword sequence; it does not read files or print results.
-- `format_results` formats the calculated values for display.
-- `main` connects file input, analysis, error reporting, and console output.
+Run the tests with:
 
-The keyword lists are defined once and combined into `KEYWORDS`, while a
-single analysis loop handles every keyword. This keeps the probability logic
-from being duplicated for positive and negative words and makes the core
-calculation independently testable.
-
-**Worked example (`excellent`):** 25,000 of 50,000 reviews are positive, so
-`P(Positive) = 25,000 / 50,000 = 0.5`. The word appears in 2,868 positive
-reviews, so `P(excellent | Positive) = 2,868 / 25,000 = 0.11472`. It appears
-in 3,552 reviews overall, so `P(excellent) = 3,552 / 50,000 = 0.07104`.
-Therefore:
-
-`P(Positive | excellent) = 0.11472 * 0.5 / 0.07104 = 0.807432`
-
-In this dataset, about 80.74% of reviews containing `excellent` are labeled
-positive. This does not mean an individual review has a guaranteed sentiment:
-the method ignores word order, negation (such as “not excellent”), sarcasm, and
-the rest of the review's meaning. It is a keyword-based Bayesian estimate, not
-a complete natural-language classifier.
-
-## Results from the provided dataset
-
-The following results were generated from the 50,000-review Kaggle CSV in this
-repository. The dataset contains 25,000 positive reviews, so the prior is
-`P(Positive) = 0.5`. Counts are review-level: a review contributes at most once
-to a keyword, even if the word appears repeatedly.
-
-| Keyword   | Prior: P(Positive) | Likelihood: P(keyword\|Positive) | Marginal: P(keyword) | Posterior: P(Positive\|keyword) | Positive keyword reviews / all keyword reviews |
-| --------- | -----------------: | -------------------------------: | -------------------: | ------------------------------: | ---------------------------------------------: |
-| excellent |           0.500000 |                         0.114720 |             0.071040 |                        0.807432 |                                  2,868 / 3,552 |
-| amazing   |           0.500000 |                         0.067160 |             0.043160 |                        0.778035 |                                  1,679 / 2,158 |
-| wonderful |           0.500000 |                         0.090320 |             0.055600 |                        0.812230 |                                  2,258 / 2,780 |
-| terrible  |           0.500000 |                         0.015320 |             0.054020 |                        0.141799 |                                    383 / 2,701 |
-| awful     |           0.500000 |                         0.011360 |             0.057660 |                        0.098508 |                                    284 / 2,883 |
-| worst     |           0.500000 |                         0.016440 |             0.088680 |                        0.092693 |                                    411 / 4,434 |
-
-These estimates show that the selected positive words are associated with a
-positive label in about 78–81% of matching reviews. For the selected negative
-words, `P(Positive | keyword)` is about 9–14%. These are associations in this
-dataset, not proof that a keyword alone determines a review's sentiment.
-
-## Tests
-
-Run the standard-library tests with:
-
-```powershell
+```bash
 python -m unittest -v test_bayesian_sentiment.py
 ```
+
+## Part 3 — Manual calculation of gradient descent
+
+The required handwritten work is provided in
+[`formative3 part 3 group7.pdf`](./formative3%20part%203%20group7.pdf). If a
+second manual-calculation PDF is required, add it at
+[`docs/manual-calculations-supplement.pdf`](./docs/manual-calculations-supplement.pdf).
+
+Use matrix multiplication throughout; do not silently replace the vectors by
+unrelated scalar calculations. The exercise uses:
+
+```text
+y = m1*x1 + m2*x2 + b
+m = [-1, 2]
+b = [1, 1]
+X = [[1, 3],
+     [4, 10]]
+y = [5, 6]
+```
+
+The PDFs should visibly include:
+
+- predictions `ŷ` from the current parameters;
+- the Mean Squared Error cost;
+- the derivation of the gradients with respect to `m` and `b`;
+- complete intermediate arithmetic for every update;
+- a number of updates equal to the number of group members, with every member
+  completing at least one iteration; and
+- an explanation of how `m`, `b`, and the error change over time.
+
+## Part 4 — Gradient descent in code
+
+Open [`Gradient_descent/gradient_descent.ipynb`](./Gradient_descent/gradient_descent.ipynb)
+for the executable implementation. Its local guide is
+[`Gradient_descent/README.md`](./Gradient_descent/README.md).
+
+The notebook makes each step visible:
+
+1. calculate predictions;
+2. calculate the MSE;
+3. calculate matrix gradients;
+4. use SciPy to check the derivative of the equation/cost function;
+5. update `m` and `b`;
+6. repeat for the required number of iterations; and
+7. calculate final predictions.
+
+It also generates:
+
+- a plot of `m` and `b` over the iterations; and
+- a separate plot of error/MSE over the iterations.
+
+The implementation uses Python, NumPy, SciPy, and Matplotlib. See
+[`Gradient_descent/requirements.txt`](./Gradient_descent/requirements.txt) for
+the listed dependencies.
+
+## Deliverables checklist
+
+- [x] Root README used as the facilitator's navigation guide.
+- [x] Part 1 EM notebook.
+- [x] Part 2 Bayesian implementation.
+- [x] Part 2 automated tests.
+- [x] Neatly written Part 3 manual-calculation PDF:
+      [`formative3 part 3 group7.pdf`](./formative3%20part%203%20group7.pdf).
+- [ ] Supplementary/manual-calculation PDF:
+      [`docs/manual-calculations-supplement.pdf`](./docs/manual-calculations-supplement.pdf).
+- [x] Combined assignment notebook:
+      [`Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb`](./Formative_Assessment_3_Probability,_Bayesian_Inference,_and_Gradient_Descent_Group7.ipynb).
+- [x] Part 4 gradient-descent notebook.
+- [ ] Contribution-evidence PDF:
+      [`docs/contributions.pdf`](./docs/contributions.pdf).
+- [ ] Relevant images/plots embedded in the notebooks.
+- [ ] Git history showing each member's contribution.
+
+## Suggested presentation route
+
+1. Introduce the assignment and repository map.
+2. Open Part 1 and explain why EM is preferable to a global-mean split.
+3. Run a facilitator-supplied height and interpret both posterior probabilities.
+4. Run Part 2, review the keyword probability output, and explain the selected
+   Bayes calculation.
+5. Walk through the handwritten matrix calculations in the two PDFs.
+6. Run Part 4, compare the code output with the manual work, and interpret both
+   plots.
+7. Finish with the contribution evidence and invite questions.
+
+## Team contribution evidence
+
+See [`docs/contributions.pdf`](./docs/contributions.pdf) *(to be added)* for
+the contribution record. The repository's commit history is the source of
+truth for code changes; each member should use their own account when making
+commits and should be prepared to explain the work they contributed.
